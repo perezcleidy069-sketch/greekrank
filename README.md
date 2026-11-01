@@ -2,6 +2,71 @@
 
 Frontend de GeekRank hecho con HTML, CSS y JavaScript nativo. Consume la API Karen Flix en `/api/v1`; no necesita frameworks ni librerías de frontend.
 
+## Árbol de trabajo y estructura
+
+El frontend y el backend son proyectos separados. El frontend contiene la interfaz; la API y la base de datos están en la carpeta `karen-flix`, que se ejecuta aparte.
+
+```text
+greekrank/
+├── index.html             # Página principal y estructura de las vistas
+├── css/
+│   └── styles.css         # Estilos y diseño responsive
+├── js/
+│   ├── app.js             # Lógica principal: catálogo, reseñas y acciones
+│   ├── api.js             # Conexión con la API y envío del token
+│   └── ui.js              # Modales, pestañas y otras interacciones visuales
+└── README.md              # Guía del proyecto, configuración y uso
+
+karen-flix/                 API backend (proyecto separado)
+├── server.js
+├── src/
+│   ├── app.js
+│   ├── config/
+│   ├── controllers/
+│   ├── database/
+│   ├── dto/
+│   ├── factory/
+│   ├── middlewares/
+│   ├── models/
+│   ├── observer/
+│   ├── routers/
+│   ├── services/
+│   ├── utils/
+│   └── validator/
+├── tests/
+├── .env.example
+└── package.json
+```
+
+`node_modules/` y el archivo `.env` del backend no se incluyen en el árbol: son dependencias generadas y configuración local, respectivamente.
+
+### Qué hace cada parte
+
+**Frontend (`greekrank/`):**
+
+- `index.html`: estructura de la página, vistas, formularios y puntos de carga de los scripts y estilos.
+- `css/styles.css`: diseño visual y adaptación a distintos tamaños de pantalla.
+- `js/app.js`: comportamiento de la aplicación; carga y muestra películas, reseñas y ranking, y gestiona las acciones de usuario y administrador.
+- `js/api.js`: comunicación HTTP con Karen Flix; agrega el token de sesión a las solicitudes autenticadas y presenta errores de la API.
+- `js/ui.js`: acciones y utilidades de interfaz compartidas, como abrir el acceso, cambiar pestañas y mostrar notificaciones.
+- `README.md`: instrucciones de instalación, configuración y uso.
+
+**Backend (`karen-flix/`, separado del frontend):**
+
+- `server.js`: carga variables locales y arranca el servidor.
+- `src/app.js`: configura Express, CORS, límites de solicitudes, documentación y rutas de la API.
+- `src/routers/`: define los endpoints para usuarios, películas, reseñas, categorías, actores y directores.
+- `src/controllers/`, `src/services/` y `src/models/`: organizan el manejo de solicitudes, reglas de negocio y acceso a datos.
+- `src/middlewares/`, `src/validator/` y `src/dto/`: autenticación, permisos, validación y forma de los datos.
+- `src/config/`: conexión a MySQL, autenticación JWT y documentación OpenAPI.
+- `src/database/`: esquema y datos iniciales SQL, además de migraciones para bases ya creadas.
+- `src/factory/`, `src/observer/` y `src/utils/`: utilidades y lógica compartida, incluida la creación segura de usuarios y el cálculo de ranking.
+- `tests/`: pruebas automatizadas del backend.
+- `.env.example`: plantilla de configuración; se copia a `.env` y se completa localmente.
+- `package.json`: dependencias y comandos npm del backend.
+
+**Recorrido de una solicitud:** `index.html` carga `app.js`; cuando se necesitan datos, `app.js` llama a `api.js`. La solicitud llega a un endpoint definido en `src/routers/`, donde se valida la sesión y la entrada; después la lógica del backend consulta o modifica MySQL. La respuesta vuelve al frontend, que actualiza la pantalla. Las operaciones administrativas se protegen en la API además de ocultar sus controles en la interfaz.
+
 ## Conectar con la API
 
 Por defecto, el frontend usa el servidor API del mismo equipo en `http://localhost:3000/api/v1`. La configuración no depende de la carpeta donde esté guardado el proyecto.
