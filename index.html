@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <meta name="theme-color" content="#0b0c10">
+    <meta name="api-base" content="">
     <title>GeekRank - Reseñas y rankings</title>
     <link rel="stylesheet" href="css/styles.css">
 </head>
@@ -31,13 +32,14 @@
                     <span id="user-role-pill" class="role-pill">GUEST</span>
                     <span id="user-name-display" class="user-name">Invitado</span>
                 </div>
-                <button id="auth-action-btn" class="button button-gold button-small" type="button" onclick="openAuthModal()">
+                <button id="auth-action-btn" class="button button-gold button-small" type="button" onclick="handleAuthAction()">
                     <span aria-hidden="true">↪</span> <span>Sesión</span>
                 </button>
             </div>
 
             <nav class="main-nav" aria-label="Navegación principal">
                 <button class="nav-link is-active" type="button" onclick="navigateTo('home')"><span aria-hidden="true">⌕</span> Explorar</button>
+                <button class="nav-link" type="button" onclick="navigateTo('ranking')"><span aria-hidden="true">🏆</span> Ranking</button>
                 <button class="nav-link" type="button" onclick="navigateTo('categories')"><span aria-hidden="true">▦</span> Categorías</button>
                 <button class="nav-link" type="button" onclick="navigateTo('cast')"><span aria-hidden="true">♟</span> Reparto</button>
                 <button class="nav-link" type="button" onclick="navigateTo('add-movie')"><span aria-hidden="true">＋</span> Proponer</button>
@@ -76,6 +78,15 @@
             <div id="media-grid" class="media-grid"></div>
         </section>
 
+        <section id="view-ranking" class="view-section page-stack hidden">
+            <div class="section-heading ranking-heading">
+                <p class="eyebrow">Las favoritas de la comunidad</p>
+                <h2>Ranking de películas y series</h2>
+                <p>Las películas más recomendadas</p>
+            </div>
+            <div id="ranking-grid" class="media-grid"></div>
+        </section>
+
         <section id="view-categories" class="view-section page-stack hidden">
             <div class="section-heading">
                 <p class="eyebrow">Encuentra tu género</p>
@@ -87,17 +98,43 @@
         <section id="view-cast" class="view-section page-stack hidden">
             <div class="section-heading">
                 <p class="eyebrow">Detrás de cada historia</p>
-                <h2>Directores y actores</h2>
+                <h2>Explorar reparto</h2>
             </div>
-            <div class="cast-grid">
-                <div class="cast-column">
-                    <h3>Directores</h3>
-                    <div id="directors-list" class="cast-list"></div>
+            <div id="cast-groups" class="cast-category-grid">
+                <button class="cast-category-card" type="button" onclick="openCastGroup('directors')">
+                    <span class="cast-category-icon" aria-hidden="true">🎬</span>
+                    <span class="cast-category-copy">
+                        <strong>Directores</strong>
+                        <span>Conoce quién está detrás de cada historia.</span>
+                        <span id="directors-count" class="cast-category-count"></span>
+                    </span>
+                    <span class="cast-category-arrow" aria-hidden="true">→</span>
+                </button>
+                <button class="cast-category-card cast-category-actors" type="button" onclick="openCastGroup('actors')">
+                    <span class="cast-category-icon" aria-hidden="true">♟</span>
+                    <span class="cast-category-copy">
+                        <strong>Actores</strong>
+                        <span>Descubre a las personas que dan vida a los personajes.</span>
+                        <span id="actors-count" class="cast-category-count"></span>
+                    </span>
+                    <span class="cast-category-arrow" aria-hidden="true">→</span>
+                </button>
+            </div>
+            <div id="cast-people-panel" class="cast-subview hidden">
+                <button class="back-button" type="button" onclick="showCastHome()">← Volver a reparto</button>
+                <div class="section-heading">
+                    <p class="eyebrow">Detrás de cada historia</p>
+                    <h2 id="cast-people-title"></h2>
                 </div>
-                <div class="cast-column">
-                    <h3>Actores</h3>
-                    <div id="actors-list" class="cast-list"></div>
+                <div id="cast-people-list" class="people-grid"></div>
+            </div>
+            <div id="cast-movies-panel" class="cast-subview hidden">
+                <button class="back-button" type="button" onclick="openCastGroup('directors')">← Volver a directores</button>
+                <div class="section-heading">
+                    <p class="eyebrow">Películas y series</p>
+                    <h2 id="director-movies-title"></h2>
                 </div>
+                <div id="director-movies-grid" class="media-grid"></div>
             </div>
         </section>
 
@@ -108,21 +145,57 @@
 
         <section id="view-add-movie" class="view-section form-page hidden">
             <div class="form-panel">
-                <p class="eyebrow">Comparte con la comunidad</p>
-                <h2>Proponer una película o serie</h2>
-                <form id="add-media-form" onsubmit="handleAddMedia(event)" class="form-stack">
-                    <label for="media-title">Título</label>
-                    <input type="text" id="media-title" placeholder="Título de la obra" required>
-                    <label for="media-category">Categoría</label>
-                    <select id="media-category" required></select>
-                    <label for="media-year">Año de estreno</label>
-                    <input type="number" id="media-year" value="2024" min="1888" max="2100" required>
-                    <label for="media-image">Imagen del póster <span>(opcional)</span></label>
-                    <input type="url" id="media-image" placeholder="https://...">
-                    <label for="media-description">Sinopsis</label>
-                    <textarea id="media-description" placeholder="¿De qué trata?" required rows="5"></textarea>
-                    <button type="submit" class="button button-cyan">Enviar propuesta</button>
-                </form>
+                <p class="eyebrow">Gestión de contenido</p>
+                <h2>Proponer o crear contenido</h2>
+                <label for="creation-type">¿Qué deseas agregar?</label>
+                <select id="creation-type" onchange="handleCreationTypeChange()">
+                    <option value="movie">Proponer película o serie</option>
+                </select>
+                <div id="creation-auth-note" class="form-notice hidden">
+                    Inicia sesión para enviar una propuesta.
+                    <button class="text-button" type="button" onclick="openAuthModal()">Iniciar sesión</button>
+                </div>
+                <div id="catalog-permission-note" class="form-notice hidden"></div>
+                <div id="movie-form-panel">
+                    <p class="form-notice">Las propuestas de películas y series quedan pendientes hasta que un administrador las apruebe.</p>
+                    <form id="add-media-form" onsubmit="handleAddMedia(event)" class="form-stack">
+                        <label for="media-title">Título</label>
+                        <input type="text" id="media-title" placeholder="Título de la obra" required>
+                        <label for="media-category">Categoría</label>
+                        <select id="media-category" required></select>
+                        <label for="media-director">Director <span>(opcional)</span></label>
+                        <select id="media-director">
+                            <option value="">Sin especificar</option>
+                        </select>
+                        <label for="media-type">Tipo</label>
+                        <select id="media-type" required>
+                            <option value="pelicula">Película</option>
+                            <option value="serie">Serie</option>
+                        </select>
+                        <label for="media-year">Año de estreno</label>
+                        <input type="number" id="media-year" value="2024" min="1888" max="2100" required>
+                        <label for="media-image">Imagen del póster <span>(opcional)</span></label>
+                        <input type="url" id="media-image" placeholder="https://...">
+                        <label for="media-description">Sinopsis</label>
+                        <textarea id="media-description" placeholder="¿De qué trata?" required rows="5"></textarea>
+                        <button type="submit" class="button button-cyan">Enviar propuesta</button>
+                    </form>
+                </div>
+                <div id="catalog-form-panel" class="hidden">
+                    <form id="add-catalog-form" onsubmit="handleAddCatalog(event)" class="form-stack">
+                        <label for="catalog-name">Nombre</label>
+                        <input type="text" id="catalog-name" maxlength="60" required>
+                        <div id="catalog-surname-field">
+                            <label for="catalog-surname">Apellido</label>
+                            <input type="text" id="catalog-surname" maxlength="250">
+                        </div>
+                        <div id="catalog-image-field">
+                            <label id="catalog-image-label" for="catalog-image">Foto o imagen <span>(opcional)</span></label>
+                            <input type="url" id="catalog-image" placeholder="https://...">
+                        </div>
+                        <button id="catalog-submit" type="submit" class="button button-cyan">Crear</button>
+                    </form>
+                </div>
             </div>
         </section>
 
@@ -134,6 +207,10 @@
             <div class="admin-panel">
                 <h3>Obras pendientes</h3>
                 <div id="pending-list" class="cast-list"></div>
+            </div>
+            <div class="admin-panel">
+                <h3>Solicitudes de administrador</h3>
+                <div id="admin-requests-list" class="cast-list"></div>
             </div>
         </section>
     </main>
@@ -152,6 +229,10 @@
                 <input type="email" id="login-email" placeholder="tu@correo.com" autocomplete="email" required>
                 <label for="login-password">Contraseña</label>
                 <input type="password" id="login-password" placeholder="Tu contraseña" autocomplete="current-password" required>
+                <label for="login-admin-code">Código de administrador <span>(solo cuentas administradoras)</span></label>
+                <input type="password" id="login-admin-code" placeholder="Ingresa el código 003 si eres administrador"
+                    inputmode="numeric" autocomplete="off" maxlength="32">
+                <p class="account-type-note">Los usuarios pueden dejarlo vacío; las cuentas administradoras lo necesitan para gestionar el catálogo.</p>
                 <button type="submit" class="button button-gold">Ingresar</button>
             </form>
             <form id="form-register" onsubmit="handleRegister(event)" class="form-stack hidden">
@@ -160,7 +241,23 @@
                 <label for="reg-email">Correo</label>
                 <input type="email" id="reg-email" placeholder="tu@correo.com" autocomplete="email" required>
                 <label for="reg-password">Contraseña</label>
-                <input type="password" id="reg-password" placeholder="Crea una contraseña" autocomplete="new-password" required>
+                <input type="password" id="reg-password" placeholder="Crea una contraseña" autocomplete="new-password" minlength="8" required>
+                <fieldset class="account-type-field">
+                    <legend>Tipo de cuenta</legend>
+                    <div class="account-type-options">
+                        <button id="register-user-type" class="account-type-button is-active" type="button"
+                            aria-pressed="true" onclick="selectRegistrationType('usuario')">Usuario</button>
+                        <button id="register-admin-type" class="account-type-button" type="button"
+                            aria-pressed="false" onclick="selectRegistrationType('administrador')">Administrador</button>
+                    </div>
+                    <p id="register-role-note" class="account-type-note">Crea una cuenta para participar en la comunidad.</p>
+                </fieldset>
+                <div id="register-admin-code-group" class="hidden">
+                    <label for="reg-admin-code">Código de administrador</label>
+                    <input type="password" id="reg-admin-code" placeholder="Ingresa el código" inputmode="numeric"
+                        autocomplete="off" pattern="003" maxlength="3" title="El código debe ser 003">
+                    <p class="account-type-note">El código permite enviar la solicitud; un administrador todavía debe aprobarla.</p>
+                </div>
                 <button type="submit" class="button button-cyan">Crear cuenta</button>
             </form>
         </div>

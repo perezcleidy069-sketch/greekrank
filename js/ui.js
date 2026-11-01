@@ -46,6 +46,24 @@ function switchAuthTab(tab) {
     }
 }
 
+function selectRegistrationType(type) {
+    const requestAdmin = type === 'administrador';
+    const userButton = document.getElementById('register-user-type');
+    const adminButton = document.getElementById('register-admin-type');
+    const codeGroup = document.getElementById('register-admin-code-group');
+    const codeInput = document.getElementById('reg-admin-code');
+    userButton.classList.toggle('is-active', !requestAdmin);
+    adminButton.classList.toggle('is-active', requestAdmin);
+    userButton.setAttribute('aria-pressed', String(!requestAdmin));
+    adminButton.setAttribute('aria-pressed', String(requestAdmin));
+    codeGroup.classList.toggle('hidden', !requestAdmin);
+    codeInput.required = requestAdmin;
+    if (!requestAdmin) codeInput.value = '';
+    document.getElementById('register-role-note').textContent = requestAdmin
+        ? 'Tu cuenta será de usuario hasta que un administrador apruebe tu solicitud.'
+        : 'Crea una cuenta para participar en la comunidad.';
+}
+
 function navigateTo(viewId) {
     document.querySelectorAll('.view-section').forEach(el => el.classList.add('hidden'));
     const target = document.getElementById(`view-${viewId}`);

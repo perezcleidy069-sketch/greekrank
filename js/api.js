@@ -1,22 +1,32 @@
-const API_BASE = 'http://localhost:3000/api';
+const configuredApiBase = document.querySelector('meta[name="api-base"]')?.content.trim();
+const defaultApiBase = `${location.protocol === 'file:' ? 'http:' : location.protocol}//${location.hostname || 'localhost'}:3000/api/v1`;
+const API_BASE = (configuredApiBase || defaultApiBase).replace(/\/+$/, '');
 
 async function apiRequest(endpoint, method = 'GET', body = null) {
     const token = localStorage.getItem('jwt_token');
-    const headers = { 'Content-Type': 'application/json' };
-    if (token) headers['Authorization'] = `Bearer ${token}`;
+    const headers = {};
 
+    if (body !== null) headers['Content-Type'] = 'application/json';
+    if (token) headers.Authorization = `Bearer ${token}`;
+
+    let response;
     try {
-        const response = await fetch(`${API_BASE}${endpoint}`, {
+        response = await fetch(`${API_BASE}${endpoint}`, {
             method,
             headers,
-            body: body ? JSON.stringify(body) : null
+            body: body === null ? null : JSON.stringify(body)
         });
-
-        const data = await response.json();
-        if (!response.ok) throw new Error(data.message || 'Error en la petición API');
-        return data;
     } catch (error) {
-        showNotification(error.message, 'error');
+        throw new Error(`No se pudo conectar con la API (${API_BASE}). Verifica que el servidor esté encendido y que la dirección sea correcta.`);
+    }
+
+    const data = response.status === 204 ? null : await response.json().catch(() => null);
+    if (!response.ok) {
+        const message = data?.error || data?.message || `Error HTTP ${response.status}`;
+        const error = new Error(message);
+        error.status = response.status;
         throw error;
     }
+
+    return data;
 }
