@@ -18,6 +18,11 @@ function openAuthModal() {
     document.body.classList.add('modal-open');
 }
 
+function openLoginModal() {
+    switchAuthTab('login');
+    openAuthModal();
+}
+
 function closeAuthModal() {
     document.getElementById('auth-modal').classList.add('hidden');
     document.body.classList.remove('modal-open');

@@ -303,7 +303,7 @@ function renderReviews(reviews) {
                         <button type="button" class="action-button action-dislike" onclick="voteReview(${id}, 'dislike')">No me gusta</button>
                     ` : isOwnReview
                         ? '<span class="review-vote-note">No puedes votar tu propia reseña</span>'
-                        : '<span class="review-vote-note">Inicia sesión para votar esta reseña</span>'}
+                        : '<button type="button" class="action-button action-like" onclick="openLoginModal()">Inicia sesión para votar</button>'}
                 </div>
             </article>
         `;
