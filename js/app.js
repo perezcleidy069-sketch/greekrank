@@ -36,18 +36,18 @@ async function loadInitialData() {
 function renderMediaGrid(items) {
     const grid = document.getElementById('media-grid');
     if (!items.length) {
-        grid.innerHTML = `<p class="text-gray-500 text-xs col-span-full text-center py-8">No hay elementos disponibles.</p>`;
+        grid.innerHTML = `<p class="empty-state">No hay elementos disponibles.</p>`;
         return;
     }
     grid.innerHTML = items.map(m => `
-        <div class="bg-cardBg border border-gray-800 rounded-xl overflow-hidden hover:border-goldAccent/50 transition cursor-pointer" onclick="showDetail(${m.idpelicula})">
-            <img src="${m.imagen || 'https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?auto=format&fit=crop&w=600&q=80'}" class="w-full h-48 object-cover">
-            <div class="p-4">
-                <span class="text-[10px] text-goldAccent font-bold uppercase">Película / Serie</span>
-                <h3 class="text-lg font-bold text-white mt-1">${m.titulo}</h3>
-                <p class="text-xs text-gray-400 mt-1 line-clamp-2">${m.sinopsis}</p>
+        <article class="media-card" onclick="showDetail(${m.idpelicula})" tabindex="0" onkeydown="if(event.key === 'Enter' || event.key === ' ') showDetail(${m.idpelicula})">
+            <img ${m.imagen ? `src="${m.imagen}"` : ''} alt="Póster de ${m.titulo}" class="media-poster" loading="lazy">
+            <div class="media-copy">
+                <span class="media-type">Película / Serie</span>
+                <h3>${m.titulo}</h3>
+                <p>${m.sinopsis || 'Sinopsis no disponible.'}</p>
             </div>
-        </div>
+        </article>
     `).join('');
 }
 
@@ -58,25 +58,25 @@ async function showDetail(id) {
 
         const detailCard = document.getElementById('detail-card');
         detailCard.innerHTML = `
-            <div class="flex flex-col md:flex-row gap-6">
-                <img src="${movie.imagen || 'https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?auto=format&fit=crop&w=600&q=80'}" class="w-full md:w-64 h-80 object-cover rounded-xl">
-                <div class="flex-grow space-y-4">
-                    <span class="text-xs font-bold text-goldAccent uppercase">${movie.anio_estreno || '2024'}</span>
-                    <h2 class="text-3xl font-display font-extrabold text-white">${movie.titulo}</h2>
-                    <p class="text-gray-300 text-sm">${movie.sinopsis}</p>
+            <div class="detail-layout">
+                <img ${movie.imagen ? `src="${movie.imagen}"` : ''} alt="Póster de ${movie.titulo}" class="detail-poster">
+                <div class="detail-copy">
+                    <span class="detail-year">${movie.anio_estreno || '2024'}</span>
+                    <h2>${movie.titulo}</h2>
+                    <p>${movie.sinopsis || 'Sinopsis no disponible.'}</p>
                     
-                    <div class="flex items-center gap-4 pt-2 border-t border-gray-800 flex-wrap">
-                        <button onclick="voteMovie(${movie.idpelicula}, 'like')" class="flex items-center gap-2 bg-darkBg border border-emerald-500/40 text-emerald-400 px-4 py-2 rounded-xl text-xs hover:bg-emerald-500 hover:text-black transition">
-                            <i class="fa-solid fa-thumbs-up"></i> <span>Like</span>
+                    <div class="detail-actions">
+                        <button onclick="voteMovie(${movie.idpelicula}, 'like')" class="action-button action-like">
+                            <span aria-hidden="true">▲</span> Like
                         </button>
-                        <button onclick="voteMovie(${movie.idpelicula}, 'dislike')" class="flex items-center gap-2 bg-darkBg border border-rose-500/40 text-rose-400 px-4 py-2 rounded-xl text-xs hover:bg-rose-500 hover:text-black transition">
-                            <i class="fa-solid fa-thumbs-down"></i> <span>Dislike</span>
+                        <button onclick="voteMovie(${movie.idpelicula}, 'dislike')" class="action-button action-dislike">
+                            <span aria-hidden="true">▼</span> Dislike
                         </button>
-                        <button onclick="updateMovie(${movie.idpelicula})" class="bg-darkBg border border-goldAccent/40 text-goldAccent px-4 py-2 rounded-xl text-xs hover:bg-goldAccent hover:text-black transition">
-                            <i class="fa-solid fa-pen"></i> Actualizar
+                        <button onclick="updateMovie(${movie.idpelicula})" class="action-button action-edit">
+                            <span aria-hidden="true">✎</span> Actualizar
                         </button>
-                        <button onclick="deleteMovie(${movie.idpelicula})" class="bg-darkBg border border-red-500/40 text-red-400 px-4 py-2 rounded-xl text-xs hover:bg-red-500 hover:text-white transition">
-                            <i class="fa-solid fa-trash"></i> Eliminar
+                        <button onclick="deleteMovie(${movie.idpelicula})" class="action-button action-delete">
+                            <span aria-hidden="true">×</span> Eliminar
                         </button>
                     </div>
                 </div>
@@ -148,10 +148,10 @@ function renderCategoriesView() {
     const grid = document.getElementById('categories-grid');
     if(!grid) return;
     grid.innerHTML = appState.categories.map(c => `
-        <div class="bg-cardBg border border-gray-800 p-4 rounded-xl text-center hover:border-goldAccent cursor-pointer" onclick="filterByCategory(${c.id})">
-            <i class="fa-solid fa-film text-2xl text-goldAccent mb-2"></i>
-            <h4 class="text-white font-bold text-sm">${c.nombre}</h4>
-        </div>
+        <button class="category-card" type="button" onclick="filterByCategory(${c.id})">
+            <span class="category-icon" aria-hidden="true">▦</span>
+            <h3>${c.nombre}</h3>
+        </button>
     `).join('');
 }
 
@@ -164,8 +164,8 @@ function filterByCategory(catId) {
 function renderCastView() {
     const dirs = document.getElementById('directors-list');
     const acts = document.getElementById('actors-list');
-    if(dirs) dirs.innerHTML = appState.directors.map(d => `<div class="bg-cardBg p-3 rounded-xl text-xs text-white border border-gray-800"><i class="fa-solid fa-clapperboard text-goldAccent mr-2"></i>${d.nombre} ${d.apellido || ''}</div>`).join('');
-    if(acts) acts.innerHTML = appState.actors.map(a => `<div class="bg-cardBg p-3 rounded-xl text-xs text-white border border-gray-800"><i class="fa-solid fa-user-ninja text-neonBlue mr-2"></i>${a.nombre} ${a.apellido || ''}</div>`).join('');
+    if(dirs) dirs.innerHTML = appState.directors.map(d => `<div class="cast-item">${d.nombre} ${d.apellido || ''}</div>`).join('');
+    if(acts) acts.innerHTML = appState.actors.map(a => `<div class="cast-item">${a.nombre} ${a.apellido || ''}</div>`).join('');
 }
 
 async function handleLogin(e) {

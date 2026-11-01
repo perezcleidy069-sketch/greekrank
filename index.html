@@ -1,178 +1,167 @@
 <!DOCTYPE html>
-<html lang="es" class="dark">
+<html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>GeekRank - Plataforma Geek de Reseñas y Rankings</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script>
-        tailwind.config = {
-            darkMode: 'class',
-            theme: {
-                extend: {
-                    colors: {
-                        darkBg: '#0b0c10',
-                        cardBg: '#1f2833',
-                        cardHover: '#2a3644',
-                        goldAccent: '#c5a059',
-                        carmineRed: '#800020',
-                        neonBlue: '#45f3ff',
-                        textMain: '#c5c6c7',
-                        textBright: '#66fcf1'
-                    },
-                    fontFamily: {
-                        sans: ['Inter', 'sans-serif'],
-                        display: ['Orbitron', 'sans-serif']
-                    }
-                }
-            }
-        }
-    </script>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Orbitron:wght@600;800;900&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta name="theme-color" content="#0b0c10">
+    <title>GeekRank - Reseñas y rankings</title>
     <link rel="stylesheet" href="css/styles.css">
 </head>
-<body class="flex flex-col min-h-screen antialiased selection:bg-goldAccent selection:text-black">
-
-    <header class="sticky top-0 z-40 bg-darkBg/95 backdrop-blur-md border-b border-gray-800">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 sm:h-20 flex items-center justify-between">
-            <div class="flex items-center space-x-2.5 sm:space-x-3 cursor-pointer" onclick="navigateTo('home')">
-                <div class="w-10 h-10 sm:w-12 sm:h-12 bg-cardBg border border-goldAccent/50 rounded-xl flex items-center justify-center shadow-lg gold-glow flex-shrink-0">
-                    <svg class="w-6 h-6 sm:w-8 sm:h-8 text-goldAccent" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+<body>
+    <header class="site-header">
+        <div class="header-inner">
+            <button class="brand" type="button" onclick="navigateTo('home')" aria-label="GeekRank, ir al inicio">
+                <span class="brand-mark" aria-hidden="true">
+                    <svg viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
                         <circle cx="50" cy="50" r="42" stroke="currentColor" stroke-width="6" stroke-dasharray="8 4"/>
                         <circle cx="50" cy="50" r="28" stroke="#66fcf1" stroke-width="4"/>
-                        <path d="M50 10 L50 90 M10 50 L90 50 M22 22 L78 78 M22 78 L78 22" stroke="currentColor" stroke-width="3" opacity="0.6"/>
-                        <polygon points="50,18 58,38 80,38 62,50 68,72 50,58 32,72 38,50 20,38 42,38" fill="currentColor" opacity="0.9"/>
+                        <path d="M50 10v80M10 50h80M22 22l56 56M22 78l56-56" stroke="currentColor" stroke-width="3" opacity=".6"/>
+                        <polygon points="50,18 58,38 80,38 62,50 68,72 50,58 32,72 38,50 20,38 42,38" fill="currentColor"/>
                         <circle cx="50" cy="50" r="10" fill="#0b0c10" stroke="#66fcf1" stroke-width="3"/>
                     </svg>
+                </span>
+                <span class="brand-copy">
+                    <span class="brand-name">GEEK<span>RANK</span></span>
+                    <span class="brand-tagline">Cine · Anime · Series</span>
+                </span>
+            </button>
+
+            <div class="header-actions">
+                <div id="user-badge" class="user-badge hidden">
+                    <span id="user-role-pill" class="role-pill">GUEST</span>
+                    <span id="user-name-display" class="user-name">Invitado</span>
                 </div>
-                <div>
-                    <span class="font-display font-black text-lg sm:text-2xl tracking-wider text-white">GEEK<span class="text-goldAccent">RANK</span></span>
-                    <p class="text-[9px] sm:text-[10px] text-gray-400 uppercase tracking-widest -mt-1 font-semibold">Cine • Anime • Series</p>
-                </div>
+                <button id="auth-action-btn" class="button button-gold button-small" type="button" onclick="openAuthModal()">
+                    <span aria-hidden="true">↪</span> <span>Sesión</span>
+                </button>
             </div>
 
-            <nav class="hidden md:flex items-center space-x-2 lg:space-x-4 text-xs sm:text-sm font-medium">
-                <button onclick="navigateTo('home')" class="text-textBright flex items-center gap-2 px-3 py-2 rounded-lg transition hover:text-white">
-                    <i class="fa-solid fa-compass"></i> Explorar
-                </button>
-                <button onclick="navigateTo('categories')" class="text-gray-400 flex items-center gap-2 px-3 py-2 rounded-lg transition hover:text-white">
-                    <i class="fa-solid fa-tags"></i> Categorías
-                </button>
-                <button onclick="navigateTo('cast')" class="text-gray-400 flex items-center gap-2 px-3 py-2 rounded-lg transition hover:text-white">
-                    <i class="fa-solid fa-users"></i> Reparto
-                </button>
-                <button onclick="navigateTo('add-movie')" class="text-gray-400 flex items-center gap-2 px-3 py-2 rounded-lg transition hover:text-white">
-                    <i class="fa-solid fa-plus-circle"></i> Proponer
-                </button>
-                <button id="nav-admin" onclick="navigateTo('admin')" class="text-gray-400 flex items-center gap-2 px-3 py-2 rounded-lg transition hover:text-white hidden">
-                    <i class="fa-solid fa-user-shield text-goldAccent"></i> Admin
-                </button>
+            <nav class="main-nav" aria-label="Navegación principal">
+                <button class="nav-link is-active" type="button" onclick="navigateTo('home')"><span aria-hidden="true">⌕</span> Explorar</button>
+                <button class="nav-link" type="button" onclick="navigateTo('categories')"><span aria-hidden="true">▦</span> Categorías</button>
+                <button class="nav-link" type="button" onclick="navigateTo('cast')"><span aria-hidden="true">♟</span> Reparto</button>
+                <button class="nav-link" type="button" onclick="navigateTo('add-movie')"><span aria-hidden="true">＋</span> Proponer</button>
+                <button id="nav-admin" class="nav-link hidden" type="button" onclick="navigateTo('admin')"><span aria-hidden="true">♙</span> Admin</button>
             </nav>
-
-            <div class="flex items-center gap-2 sm:gap-3">
-                <div id="user-badge" class="hidden sm:flex items-center gap-2 bg-cardBg border border-gray-700 px-3 py-1.5 rounded-full text-xs">
-                    <span id="user-role-pill" class="px-2 py-0.5 rounded text-[10px] font-bold bg-goldAccent text-black uppercase">GUEST</span>
-                    <span id="user-name-display" class="text-gray-200 font-semibold truncate max-w-[100px]">Invitado</span>
-                </div>
-                <button id="auth-action-btn" onclick="openAuthModal()" class="bg-gradient-to-r from-goldAccent to-amber-600 hover:from-amber-500 hover:to-goldAccent text-black font-bold text-[11px] sm:text-xs uppercase tracking-wider px-3 sm:px-5 py-2 sm:py-2.5 rounded-lg transition shadow-md flex items-center gap-1.5 sm:gap-2 flex-shrink-0">
-                    <i class="fa-solid fa-right-to-bracket"></i> <span>Sesión</span>
-                </button>
-            </div>
         </div>
     </header>
 
-    <div id="notification-banner" class="hidden max-w-7xl mx-auto px-4 mt-4 w-full">
-        <div id="notification-content" class="p-4 rounded-xl text-xs sm:text-sm font-medium flex items-center justify-between border shadow-lg">
+    <div id="notification-banner" class="notification-wrap hidden" role="status" aria-live="polite">
+        <div id="notification-content" class="notification">
             <span id="notification-message">Notificación</span>
-            <button onclick="closeNotification()" class="text-lg leading-none">&times;</button>
+            <button class="notification-close" type="button" onclick="closeNotification()" aria-label="Cerrar notificación">&times;</button>
         </div>
     </div>
 
-    <main class="flex-grow max-w-7xl w-full mx-auto px-3 sm:px-6 lg:px-8 py-4 sm:py-8">
-        
-        <section id="view-home" class="view-section space-y-6">
-            <div class="bg-gradient-to-r from-cardBg via-darkBg to-cardBg border border-gray-800 rounded-2xl p-6 sm:p-10 shadow-2xl">
-                <h1 class="text-2xl sm:text-4xl font-display font-extrabold text-white">Ranking Geek de Cine, Anime & Series</h1>
-                <p class="text-gray-400 text-xs sm:text-sm mt-2">Busca, puntúa y gestiona tus títulos favoritos consumidos desde la API.</p>
-                <div class="mt-4 flex flex-col sm:flex-row gap-3">
-                    <input type="text" id="search-input" onkeyup="filterMedia()" placeholder="Buscar por película, actor, director o categoría..." class="w-full bg-darkBg border border-gray-700 text-white pl-4 pr-4 py-3 rounded-xl outline-none text-xs sm:text-sm">
-                    <select id="category-filter" onchange="filterMedia()" class="bg-darkBg border border-gray-700 text-gray-300 px-4 py-3 rounded-xl outline-none text-xs sm:text-sm">
-                        <option value="ALL">Todas las Categorías</option>
-                    </select>
+    <main class="page-main">
+        <section id="view-home" class="view-section page-stack">
+            <div class="hero-panel">
+                <p class="eyebrow">Tu próxima historia favorita empieza aquí</p>
+                <h1>Ranking Geek de Cine, Anime <span>&amp; Series</span></h1>
+                <p class="hero-description">Explora títulos, descubre nuevas categorías y comparte tu opinión con la comunidad.</p>
+                <div class="search-row">
+                    <label class="search-field">
+                        <span class="sr-only">Buscar títulos</span>
+                        <span class="search-icon" aria-hidden="true">⌕</span>
+                        <input type="search" id="search-input" oninput="filterMedia()" placeholder="Buscar película, actor, director...">
+                    </label>
+                    <label class="select-field">
+                        <span class="sr-only">Filtrar por categoría</span>
+                        <select id="category-filter" onchange="filterMedia()">
+                            <option value="ALL">Todas las categorías</option>
+                        </select>
+                    </label>
                 </div>
             </div>
-            <div id="media-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6"></div>
+            <div id="media-grid" class="media-grid"></div>
         </section>
 
-        <section id="view-categories" class="view-section hidden space-y-6">
-            <h2 class="text-xl font-display font-bold text-white"><i class="fa-solid fa-tags text-textBright"></i> Explorar por Categoría</h2>
-            <div id="categories-grid" class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4"></div>
+        <section id="view-categories" class="view-section page-stack hidden">
+            <div class="section-heading">
+                <p class="eyebrow">Encuentra tu género</p>
+                <h2>Explorar por categoría</h2>
+            </div>
+            <div id="categories-grid" class="categories-grid"></div>
         </section>
 
-        <section id="view-cast" class="view-section hidden space-y-6">
-            <h2 class="text-xl font-display font-bold text-white"><i class="fa-solid fa-users text-goldAccent"></i> Directores y Actores</h2>
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div>
-                    <h3 class="text-lg font-bold text-goldAccent mb-3">Directores</h3>
-                    <div id="directors-list" class="space-y-3"></div>
+        <section id="view-cast" class="view-section page-stack hidden">
+            <div class="section-heading">
+                <p class="eyebrow">Detrás de cada historia</p>
+                <h2>Directores y actores</h2>
+            </div>
+            <div class="cast-grid">
+                <div class="cast-column">
+                    <h3>Directores</h3>
+                    <div id="directors-list" class="cast-list"></div>
                 </div>
-                <div>
-                    <h3 class="text-lg font-bold text-neonBlue mb-3">Actores</h3>
-                    <div id="actors-list" class="space-y-3"></div>
+                <div class="cast-column">
+                    <h3>Actores</h3>
+                    <div id="actors-list" class="cast-list"></div>
                 </div>
             </div>
         </section>
 
-        <section id="view-detail" class="view-section hidden space-y-6">
-            <button onclick="navigateTo('home')" class="text-gray-400 hover:text-white text-xs sm:text-sm flex items-center gap-2">
-                <i class="fa-solid fa-arrow-left"></i> Volver a la cartelera
-            </button>
-            <div id="detail-card" class="bg-cardBg border border-gray-800 rounded-2xl p-6 shadow-2xl"></div>
+        <section id="view-detail" class="view-section page-stack hidden">
+            <button class="back-button" type="button" onclick="navigateTo('home')"><span aria-hidden="true">←</span> Volver a explorar</button>
+            <div id="detail-card" class="detail-card"></div>
         </section>
 
-        <section id="view-add-movie" class="view-section hidden max-w-2xl mx-auto">
-            <div class="bg-cardBg border border-gray-800 rounded-2xl p-6 space-y-4">
-                <h2 class="text-xl font-display font-bold text-white">Proponer Nueva Película / Serie</h2>
-                <form id="add-media-form" onsubmit="handleAddMedia(event)" class="space-y-3">
-                    <input type="text" id="media-title" placeholder="Título *" required class="w-full bg-darkBg border border-gray-700 text-white p-3 rounded-xl text-xs">
-                    <select id="media-category" required class="w-full bg-darkBg border border-gray-700 text-white p-3 rounded-xl text-xs"></select>
-                    <input type="number" id="media-year" value="2024" required class="w-full bg-darkBg border border-gray-700 text-white p-3 rounded-xl text-xs">
-                    <input type="url" id="media-image" placeholder="URL Imagen Poster" class="w-full bg-darkBg border border-gray-700 text-white p-3 rounded-xl text-xs">
-                    <textarea id="media-description" placeholder="Sinopsis *" required class="w-full bg-darkBg border border-gray-700 text-white p-3 rounded-xl text-xs"></textarea>
-                    <button type="submit" class="w-full bg-textBright text-black font-bold py-3 rounded-xl text-xs uppercase">Enviar Propuesta</button>
+        <section id="view-add-movie" class="view-section form-page hidden">
+            <div class="form-panel">
+                <p class="eyebrow">Comparte con la comunidad</p>
+                <h2>Proponer una película o serie</h2>
+                <form id="add-media-form" onsubmit="handleAddMedia(event)" class="form-stack">
+                    <label for="media-title">Título</label>
+                    <input type="text" id="media-title" placeholder="Título de la obra" required>
+                    <label for="media-category">Categoría</label>
+                    <select id="media-category" required></select>
+                    <label for="media-year">Año de estreno</label>
+                    <input type="number" id="media-year" value="2024" min="1888" max="2100" required>
+                    <label for="media-image">Imagen del póster <span>(opcional)</span></label>
+                    <input type="url" id="media-image" placeholder="https://...">
+                    <label for="media-description">Sinopsis</label>
+                    <textarea id="media-description" placeholder="¿De qué trata?" required rows="5"></textarea>
+                    <button type="submit" class="button button-cyan">Enviar propuesta</button>
                 </form>
             </div>
         </section>
 
-        <section id="view-admin" class="view-section hidden space-y-6">
-            <h2 class="text-xl font-display font-bold text-white">Panel Administrador</h2>
-            <div class="bg-cardBg border border-gray-800 rounded-2xl p-4">
-                <h3 class="text-sm font-bold text-goldAccent mb-3">Obras Pendientes</h3>
-                <div id="pending-list" class="space-y-2"></div>
+        <section id="view-admin" class="view-section page-stack hidden">
+            <div class="section-heading">
+                <p class="eyebrow">Gestión de contenido</p>
+                <h2>Panel de administración</h2>
+            </div>
+            <div class="admin-panel">
+                <h3>Obras pendientes</h3>
+                <div id="pending-list" class="cast-list"></div>
             </div>
         </section>
     </main>
 
-    <div id="auth-modal" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
-        <div class="bg-cardBg border border-gray-700 w-full max-w-md rounded-2xl p-6 space-y-4 relative">
-            <button onclick="closeAuthModal()" class="absolute top-4 right-4 text-gray-400 text-xl">&times;</button>
-            <div class="flex border-b border-gray-800">
-                <button id="auth-tab-login" onclick="switchAuthTab('login')" class="w-1/2 pb-2 text-goldAccent border-b-2 border-goldAccent font-bold text-xs uppercase">Iniciar Sesión</button>
-                <button id="auth-tab-register" onclick="switchAuthTab('register')" class="w-1/2 pb-2 text-gray-400 font-bold text-xs uppercase">Registrarse</button>
+    <div id="auth-modal" class="modal-backdrop hidden" role="dialog" aria-modal="true" aria-labelledby="auth-title" onclick="if(event.target === this) closeAuthModal()">
+        <div class="modal-panel">
+            <button class="modal-close" type="button" onclick="closeAuthModal()" aria-label="Cerrar">&times;</button>
+            <p class="eyebrow">Únete a la comunidad</p>
+            <h2 id="auth-title" class="sr-only">Acceso a GeekRank</h2>
+            <div class="auth-tabs" role="tablist">
+                <button id="auth-tab-login" class="auth-tab is-active" type="button" role="tab" aria-selected="true" onclick="switchAuthTab('login')">Iniciar sesión</button>
+                <button id="auth-tab-register" class="auth-tab" type="button" role="tab" aria-selected="false" onclick="switchAuthTab('register')">Registrarse</button>
             </div>
-            <form id="form-login" onsubmit="handleLogin(event)" class="space-y-3">
-                <input type="email" id="login-email" placeholder="Correo" required class="w-full bg-darkBg border border-gray-700 text-white p-2.5 rounded-xl text-xs">
-                <input type="password" id="login-password" placeholder="Contraseña" required class="w-full bg-darkBg border border-gray-700 text-white p-2.5 rounded-xl text-xs">
-                <button type="submit" class="w-full bg-goldAccent text-black font-bold py-2.5 rounded-xl text-xs uppercase">Ingresar</button>
+            <form id="form-login" onsubmit="handleLogin(event)" class="form-stack">
+                <label for="login-email">Correo</label>
+                <input type="email" id="login-email" placeholder="tu@correo.com" autocomplete="email" required>
+                <label for="login-password">Contraseña</label>
+                <input type="password" id="login-password" placeholder="Tu contraseña" autocomplete="current-password" required>
+                <button type="submit" class="button button-gold">Ingresar</button>
             </form>
-            <form id="form-register" onsubmit="handleRegister(event)" class="space-y-3 hidden">
-                <input type="text" id="reg-name" placeholder="Nombre" required class="w-full bg-darkBg border border-gray-700 text-white p-2.5 rounded-xl text-xs">
-                <input type="email" id="reg-email" placeholder="Correo" required class="w-full bg-darkBg border border-gray-700 text-white p-2.5 rounded-xl text-xs">
-                <input type="password" id="reg-password" placeholder="Contraseña" required class="w-full bg-darkBg border border-gray-700 text-white p-2.5 rounded-xl text-xs">
-                <button type="submit" class="w-full bg-textBright text-black font-bold py-2.5 rounded-xl text-xs uppercase">Registrarse</button>
+            <form id="form-register" onsubmit="handleRegister(event)" class="form-stack hidden">
+                <label for="reg-name">Nombre</label>
+                <input type="text" id="reg-name" placeholder="Tu nombre" autocomplete="name" required>
+                <label for="reg-email">Correo</label>
+                <input type="email" id="reg-email" placeholder="tu@correo.com" autocomplete="email" required>
+                <label for="reg-password">Contraseña</label>
+                <input type="password" id="reg-password" placeholder="Crea una contraseña" autocomplete="new-password" required>
+                <button type="submit" class="button button-cyan">Crear cuenta</button>
             </form>
         </div>
     </div>
