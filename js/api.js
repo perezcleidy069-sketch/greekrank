@@ -27,7 +27,13 @@ async function apiRequest(endpoint, method = 'GET', body = null) {
 
     const data = response.status === 204 ? null : await response.json().catch(() => null);
     if (!response.ok) {
-        const message = data?.error || data?.message || `Error HTTP ${response.status}`;
+        const validationMessages = Array.isArray(data?.errores)
+            ? [...new Set(data.errores.map(item => item?.msg).filter(Boolean))]
+            : [];
+        const message = validationMessages.join(' ') ||
+            data?.error ||
+            data?.message ||
+            `Error HTTP ${response.status}`;
         const error = new Error(message);
         error.status = response.status;
         throw error;

@@ -1205,7 +1205,7 @@ textarea:focus-visible {
 
 .notification-wrap {
     position: fixed;
-    z-index: 40;
+    z-index: 60;
     top: 92px;
     right: max(24px, calc((100vw - 1240px) / 2));
     left: max(24px, calc((100vw - 1240px) / 2));
@@ -1239,6 +1239,11 @@ textarea:focus-visible {
     font-size: 24px;
     line-height: 1;
     cursor: pointer;
+}
+
+.button:disabled {
+    cursor: wait;
+    opacity: .7;
 }
 
 .modal-backdrop {

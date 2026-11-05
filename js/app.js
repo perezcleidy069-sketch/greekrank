@@ -813,11 +813,16 @@ async function handleLogin(event) {
 
 async function handleRegister(event) {
     event.preventDefault();
-    const nombre = document.getElementById('reg-name').value.trim();
-    const email = document.getElementById('reg-email').value.trim();
-    const contrasena = document.getElementById('reg-password').value;
+    const form = event.currentTarget;
+    const submitButton = form.querySelector('button[type="submit"]');
+    const originalButtonText = submitButton.textContent;
+    submitButton.disabled = true;
+    submitButton.textContent = 'Creando cuenta...';
 
     try {
+        const nombre = document.getElementById('reg-name').value.trim();
+        const email = document.getElementById('reg-email').value.trim();
+        const contrasena = document.getElementById('reg-password').value;
         const requestAdmin = document.getElementById('register-admin-type').getAttribute('aria-pressed') === 'true';
         const payload = {
             nombre,
@@ -836,6 +841,9 @@ async function handleRegister(event) {
         showNotification(response.mensaje || 'Registro exitoso. Inicia sesión.');
     } catch (error) {
         showNotification(error.message, 'error');
+    } finally {
+        submitButton.disabled = false;
+        submitButton.textContent = originalButtonText;
     }
 }
 
