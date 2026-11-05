@@ -152,7 +152,7 @@ function renderMediaGrid(movies, gridId = 'media-grid', showPosition = false) {
         const type = movie.tipo === 'serie' ? 'Serie' : 'Película';
         return `
             <article class="media-card" onclick="showDetail(${id})" tabindex="0"
-                onkeydown="if(event.key === 'Enter' || event.key === ' ') showDetail(${id})">
+                onkeydown="if(event.target === this && (event.key === 'Enter' || event.key === ' ')) showDetail(${id})">
                 ${showPosition ? `<span class="ranking-position">#${index + 1}</span>` : ''}
                 ${imageMarkup(movie.imagen, `Póster de ${movie.titulo}`, 'media-poster', categoryImageFor(movie))}
                 <div class="media-copy">
@@ -170,6 +170,8 @@ function renderMediaGrid(movies, gridId = 'media-grid', showPosition = false) {
                         <span>👍 ${escapeHTML(movie.likes ?? 0)}</span>
                         <span>👎 ${escapeHTML(movie.dislikes ?? 0)}</span>
                     </div>
+                    <button class="button button-cyan media-review-button" type="button"
+                        onclick="openReview(${id}, event)">Escribir reseña</button>
                 </div>
             </article>
         `;
@@ -205,6 +207,21 @@ async function showDetail(id) {
     }
 }
 
+async function openReview(id, event) {
+    event.stopPropagation();
+    await showDetail(id);
+    const reviewsSection = document.getElementById('reviews-section');
+    if (!reviewsSection || document.getElementById('view-detail').classList.contains('hidden')) return;
+
+    reviewsSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    const reviewTitle = document.getElementById('review-title');
+    if (reviewTitle) {
+        reviewTitle.focus({ preventScroll: true });
+    } else {
+        document.getElementById('review-login-button')?.focus({ preventScroll: true });
+    }
+}
+
 function renderMovieDetail(movie) {
     const id = Number(movie.idpelicula);
     const isSignedIn = Boolean(appState.currentUser);
@@ -234,6 +251,10 @@ function renderMovieDetail(movie) {
                     ${director ? `<span>Dir. ${escapeHTML(director)}</span>` : ''}
                 </div>
                 ${trailerUrl ? `<a class="trailer-link" href="${escapeHTML(trailerUrl)}" target="_blank" rel="noopener noreferrer">Ver tráiler ↗</a>` : ''}
+                <button class="button button-cyan detail-review-button" type="button"
+                    onclick="document.getElementById('reviews-section').scrollIntoView({ behavior: 'smooth', block: 'start' })">
+                    Escribir reseña
+                </button>
                 ${canManage ? `
                     <div class="detail-actions">
                         <button onclick="updateMovie(${id})" class="action-button action-edit" type="button">Actualizar</button>
@@ -244,7 +265,7 @@ function renderMovieDetail(movie) {
                     : '<p class="login-hint">Inicia sesión para actualizar o eliminar tus propuestas.</p>'}
             </div>
         </div>
-        <section class="reviews-section">
+        <section id="reviews-section" class="reviews-section">
             <div class="section-heading">
                 <p class="eyebrow">Opiniones de la comunidad</p>
                 <h3>Reseñas (${reviews.length})</h3>
@@ -258,7 +279,14 @@ function renderMovieDetail(movie) {
 
 function renderReviewForm(movieId) {
     if (!appState.currentUser) {
-        return '<p class="login-hint">Inicia sesión para dejar una reseña y calificar esta obra.</p>';
+        return `
+            <div class="login-hint">
+                <p>Inicia sesión para dejar una reseña y calificar esta obra.</p>
+                <button id="review-login-button" class="button button-gold" type="button" onclick="openLoginModal()">
+                    Iniciar sesión para reseñar
+                </button>
+            </div>
+        `;
     }
 
     return `
@@ -775,6 +803,9 @@ async function handleLogin(event) {
         closeAuthModal();
         showNotification('Sesión iniciada correctamente.');
         await loadInitialData();
+        if (appState.activeMovie) {
+            await showDetail(appState.activeMovie.idpelicula);
+        }
     } catch (error) {
         showNotification(error.message, 'error');
     }
