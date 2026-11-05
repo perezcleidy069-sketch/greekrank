@@ -412,9 +412,24 @@ textarea:focus-visible {
     padding: 16px;
 }
 
+.media-like-button,
 .media-review-button {
     width: 100%;
-    margin-top: 15px;
+}
+
+.media-like-button {
+    display: flex;
+    justify-content: center;
+    margin-top: 14px;
+}
+
+.action-like.is-liked {
+    background: #54d291;
+    color: #07130b;
+}
+
+.detail-movie-like {
+    margin-top: 16px;
 }
 
 .detail-review-button {

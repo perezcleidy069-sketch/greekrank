@@ -166,10 +166,7 @@ function renderMediaGrid(movies, gridId = 'media-grid', showPosition = false) {
                     ${Number(movie.total_resenas) > 0
                         ? `<div class="media-ranking">🏆 Ranking: ${escapeHTML(movie.ranking ?? '0.00')}</div>`
                         : ''}
-                    <div class="media-votes" aria-label="Votos de las reseñas">
-                        <span>👍 ${escapeHTML(movie.likes ?? 0)}</span>
-                        <span>👎 ${escapeHTML(movie.dislikes ?? 0)}</span>
-                    </div>
+                    ${renderMovieLikeButton(movie, 'media-like-button')}
                     <button class="button button-cyan media-review-button" type="button"
                         onclick="openReview(${id}, event)">Escribir reseña</button>
                 </div>
@@ -222,6 +219,51 @@ async function openReview(id, event) {
     }
 }
 
+function renderMovieLikeButton(movie, className) {
+    const liked = movie.me_gusta === true || Number(movie.me_gusta) === 1;
+    const label = appState.currentUser
+        ? liked ? 'Te gusta' : 'Me gusta'
+        : 'Inicia sesión para dar Me gusta';
+    return `
+        <button class="action-button action-like ${className}${liked ? ' is-liked' : ''}"
+            type="button" aria-pressed="${liked}"
+            onclick="toggleMovieLike(${Number(movie.idpelicula)}, event)">
+            👍 ${escapeHTML(movie.likes_pelicula ?? 0)} · ${label}
+        </button>
+    `;
+}
+
+async function toggleMovieLike(movieId, event) {
+    event?.stopPropagation();
+    if (!appState.currentUser) {
+        showNotification('Inicia sesión para dar Me gusta a esta película.', 'error');
+        openLoginModal();
+        return;
+    }
+
+    const id = Number(movieId);
+    const movie = Number(appState.activeMovie?.idpelicula) === id
+        ? appState.activeMovie
+        : appState.movies.find(item => Number(item.idpelicula) === id);
+    const isLiked = movie?.me_gusta === true || Number(movie?.me_gusta) === 1;
+
+    try {
+        const response = await apiRequest(
+            `/peliculas/${id}/likes`,
+            isLiked ? 'DELETE' : 'POST'
+        );
+        showNotification(response.mensaje || (isLiked
+            ? 'Quitaste tu Me gusta de esta película.'
+            : 'Te gusta esta película.'));
+        await loadInitialData();
+        if (Number(appState.activeMovie?.idpelicula) === id) {
+            await showDetail(id);
+        }
+    } catch (error) {
+        showNotification(error.message, 'error');
+    }
+}
+
 function renderMovieDetail(movie) {
     const id = Number(movie.idpelicula);
     const isSignedIn = Boolean(appState.currentUser);
@@ -245,11 +287,10 @@ function renderMovieDetail(movie) {
                     ${Number(movie.total_resenas) > 0
                         ? `<span>🏆 Ranking: ${escapeHTML(movie.ranking ?? '0.00')}</span>`
                         : ''}
-                    <span>👍 ${escapeHTML(movie.likes ?? 0)}</span>
-                    <span>👎 ${escapeHTML(movie.dislikes ?? 0)}</span>
                     <span>${escapeHTML(movie.categoria || 'Sin categoría')}</span>
                     ${director ? `<span>Dir. ${escapeHTML(director)}</span>` : ''}
                 </div>
+                ${renderMovieLikeButton(movie, 'detail-movie-like')}
                 ${trailerUrl ? `<a class="trailer-link" href="${escapeHTML(trailerUrl)}" target="_blank" rel="noopener noreferrer">Ver tráiler ↗</a>` : ''}
                 <button class="button button-cyan detail-review-button" type="button"
                     onclick="document.getElementById('reviews-section').scrollIntoView({ behavior: 'smooth', block: 'start' })">
