@@ -69,20 +69,22 @@ karen-flix/                 API backend (proyecto separado)
 
 ## Conectar con la API
 
-Por defecto, el frontend usa el servidor API del mismo equipo en `http://localhost:3000/api/v1`. La configuración no depende de la carpeta donde esté guardado el proyecto.
+En GitHub Pages, el frontend usa la API pública publicada en Vercel: `https://karen-weld.vercel.app/api/v1`. Al ejecutar el frontend localmente, usa `http://localhost:3000/api/v1`.
+
+Para desarrollo local:
 
 1. Inicia MySQL y la API Karen Flix en el puerto `3000`.
 2. Sirve esta carpeta desde `http://localhost:5173` (por ejemplo, con Live Server configurado en ese puerto).
 3. Configura `CORS_ORIGINS` en la API para incluir el origen exacto del frontend, por ejemplo `http://localhost:5173`, y reinicia el backend.
 4. Abre el frontend desde el servidor local, no directamente como archivo `file://`.
 
-Si la API está en otro equipo o puerto, cambia el contenido de `<meta name="api-base">` en `index.html` por la URL completa de la API, por ejemplo:
+La URL puede sobrescribirse en `index.html` mediante `<meta name="api-base">`, por ejemplo:
 
 ```html
-<meta name="api-base" content="http://192.168.1.25:3000/api/v1">
+<meta name="api-base" content="https://tu-api.example.com/api/v1">
 ```
 
-En ese caso, el equipo que ejecuta la API debe permitir conexiones de red y `CORS_ORIGINS` debe incluir el origen desde el que se sirve el frontend. `localhost` siempre se refiere al equipo donde se abre el navegador.
+En producción, `CORS_ORIGINS` de la API debe incluir el origen del frontend, `https://perezcleidy069-sketch.github.io` (sin `/greekrank/`). `localhost` siempre se refiere al equipo donde se abre el navegador.
 
 ## Datos que muestra
 

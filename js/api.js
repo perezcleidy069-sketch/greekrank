@@ -1,5 +1,10 @@
 const configuredApiBase = document.querySelector('meta[name="api-base"]')?.content.trim();
-const defaultApiBase = `${location.protocol === 'file:' ? 'http:' : location.protocol}//${location.hostname || 'localhost'}:3000/api/v1`;
+const isLocalEnvironment = location.protocol === 'file:'
+    || location.hostname === 'localhost'
+    || location.hostname === '127.0.0.1';
+const defaultApiBase = isLocalEnvironment
+    ? 'http://localhost:3000/api/v1'
+    : 'https://karen-weld.vercel.app/api/v1';
 const API_BASE = (configuredApiBase || defaultApiBase).replace(/\/+$/, '');
 
 async function apiRequest(endpoint, method = 'GET', body = null) {
