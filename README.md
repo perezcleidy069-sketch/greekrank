@@ -94,7 +94,7 @@ Si un póster guardado en la base no carga, la tarjeta usa como respaldo la imag
 
 El ranking de películas y series se calcula como **promedio de puntuaciones + likes de reseñas − dislikes de reseñas** y se ordena de mayor a menor. Los usuarios autenticados pueden votar reseñas de otras personas, pero no la propia; tanto la interfaz como la API aplican esa regla.
 
-El botón **Me gusta** de una película es independiente de los votos de sus reseñas. Cualquier usuario con sesión iniciada puede dar o quitar su like a una película, incluso si escribió una reseña propia; cada cuenta cuenta una sola vez. Los likes a películas no cambian el puntaje del ranking.
+Los botones **Me gusta** y **No me gusta** de una película son independientes de los votos de sus reseñas. Cualquier usuario con sesión iniciada puede votar, incluso si escribió una reseña propia; cada cuenta tiene un solo voto por película y puede cambiarlo o quitarlo. La API guarda el ID del usuario y su voto en MySQL. Estos votos no cambian el puntaje del ranking.
 
 La sección **Ranking** muestra hasta las 10 películas o series con reseñas, ordenadas por ese puntaje e indicando su posición. Si ninguna tiene reseñas, muestra “No hay ranking”.
 

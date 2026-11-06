@@ -412,24 +412,39 @@ textarea:focus-visible {
     padding: 16px;
 }
 
-.media-like-button,
+.media-movie-votes {
+    display: grid;
+    gap: 7px;
+    margin-top: 14px;
+}
+
+.movie-vote-button {
+    width: 100%;
+}
+
 .media-review-button {
     width: 100%;
 }
 
-.media-like-button {
-    display: flex;
-    justify-content: center;
-    margin-top: 14px;
-}
-
-.action-like.is-liked {
+.action-like.is-voted {
     background: #54d291;
     color: #07130b;
 }
 
-.detail-movie-like {
+.action-dislike.is-voted {
+    background: var(--color-red);
+    color: #1b090b;
+}
+
+.detail-movie-votes {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
     margin-top: 16px;
+}
+
+.detail-movie-votes .movie-vote-button {
+    width: auto;
 }
 
 .detail-review-button {

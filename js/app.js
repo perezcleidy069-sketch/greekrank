@@ -166,7 +166,7 @@ function renderMediaGrid(movies, gridId = 'media-grid', showPosition = false) {
                     ${Number(movie.total_resenas) > 0
                         ? `<div class="media-ranking">🏆 Ranking: ${escapeHTML(movie.ranking ?? '0.00')}</div>`
                         : ''}
-                    ${renderMovieLikeButton(movie, 'media-like-button')}
+                    ${renderMovieVoteButtons(movie, 'media-movie-votes')}
                     <button class="button button-cyan media-review-button" type="button"
                         onclick="openReview(${id}, event)">Escribir reseña</button>
                 </div>
@@ -219,24 +219,29 @@ async function openReview(id, event) {
     }
 }
 
-function renderMovieLikeButton(movie, className) {
-    const liked = movie.me_gusta === true || Number(movie.me_gusta) === 1;
-    const label = appState.currentUser
-        ? liked ? 'Te gusta' : 'Me gusta'
-        : 'Inicia sesión para dar Me gusta';
+function renderMovieVoteButtons(movie, className) {
+    const userVote = movie.mi_voto || null;
+    const label = appState.currentUser ? '' : ' · Inicia sesión';
     return `
-        <button class="action-button action-like ${className}${liked ? ' is-liked' : ''}"
-            type="button" aria-pressed="${liked}"
-            onclick="toggleMovieLike(${Number(movie.idpelicula)}, event)">
-            👍 ${escapeHTML(movie.likes_pelicula ?? 0)} · ${label}
-        </button>
+        <div class="movie-votes ${className}">
+            <button class="action-button action-like movie-vote-button${userVote === 'like' ? ' is-voted' : ''}"
+                type="button" aria-pressed="${userVote === 'like'}"
+                onclick="voteMovie(${Number(movie.idpelicula)}, 'like', event)">
+                👍 ${escapeHTML(movie.likes_pelicula ?? 0)} · ${userVote === 'like' ? 'Te gusta' : 'Me gusta'}${label}
+            </button>
+            <button class="action-button action-dislike movie-vote-button${userVote === 'dislike' ? ' is-voted' : ''}"
+                type="button" aria-pressed="${userVote === 'dislike'}"
+                onclick="voteMovie(${Number(movie.idpelicula)}, 'dislike', event)">
+                👎 ${escapeHTML(movie.dislikes_pelicula ?? 0)} · ${userVote === 'dislike' ? 'No te gusta' : 'No me gusta'}${label}
+            </button>
+        </div>
     `;
 }
 
-async function toggleMovieLike(movieId, event) {
+async function voteMovie(movieId, vote, event) {
     event?.stopPropagation();
     if (!appState.currentUser) {
-        showNotification('Inicia sesión para dar Me gusta a esta película.', 'error');
+        showNotification('Inicia sesión para votar esta película.', 'error');
         openLoginModal();
         return;
     }
@@ -245,16 +250,17 @@ async function toggleMovieLike(movieId, event) {
     const movie = Number(appState.activeMovie?.idpelicula) === id
         ? appState.activeMovie
         : appState.movies.find(item => Number(item.idpelicula) === id);
-    const isLiked = movie?.me_gusta === true || Number(movie?.me_gusta) === 1;
+    const removingVote = movie?.mi_voto === vote;
 
     try {
         const response = await apiRequest(
-            `/peliculas/${id}/likes`,
-            isLiked ? 'DELETE' : 'POST'
+            `/peliculas/${id}/votos`,
+            removingVote ? 'DELETE' : 'POST',
+            removingVote ? null : { voto: vote }
         );
-        showNotification(response.mensaje || (isLiked
-            ? 'Quitaste tu Me gusta de esta película.'
-            : 'Te gusta esta película.'));
+        showNotification(response.mensaje || (removingVote
+            ? 'Quitaste tu voto de esta película.'
+            : vote === 'like' ? 'Te gusta esta película.' : 'No te gusta esta película.'));
         await loadInitialData();
         if (Number(appState.activeMovie?.idpelicula) === id) {
             await showDetail(id);
@@ -290,7 +296,11 @@ function renderMovieDetail(movie) {
                     <span>${escapeHTML(movie.categoria || 'Sin categoría')}</span>
                     ${director ? `<span>Dir. ${escapeHTML(director)}</span>` : ''}
                 </div>
-                ${renderMovieLikeButton(movie, 'detail-movie-like')}
+                <div class="movie-stats">
+                    <span>👍 ${escapeHTML(movie.likes_pelicula ?? 0)} likes de película</span>
+                    <span>👎 ${escapeHTML(movie.dislikes_pelicula ?? 0)} dislikes de película</span>
+                </div>
+                ${renderMovieVoteButtons(movie, 'detail-movie-votes')}
                 ${trailerUrl ? `<a class="trailer-link" href="${escapeHTML(trailerUrl)}" target="_blank" rel="noopener noreferrer">Ver tráiler ↗</a>` : ''}
                 <button class="button button-cyan detail-review-button" type="button"
                     onclick="document.getElementById('reviews-section').scrollIntoView({ behavior: 'smooth', block: 'start' })">
