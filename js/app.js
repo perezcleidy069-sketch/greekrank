@@ -881,9 +881,6 @@ async function handleRegister(event) {
             contrasena,
             solicitar_administrador: requestAdmin
         };
-        if (requestAdmin) {
-            payload.codigo_administrador = document.getElementById('reg-admin-code').value.trim();
-        }
         const response = await apiRequest('/auth/register', 'POST', payload);
         closeAuthModal();
         switchAuthTab('login');
